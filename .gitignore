@@ -27,6 +27,9 @@ config.status
 stamp-h1
 libtool
 tags
+build/
+lttng-tools-2.6.0.tar.bz2
+bootstrap_data.tar
 
 # cscope and ctags
 cscope.*

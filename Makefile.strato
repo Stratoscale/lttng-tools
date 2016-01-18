@@ -1,0 +1,50 @@
+ROOTFS = build/rootfs
+
+RPMS_TO_INSTALL = libtool popt-devel libuuid-devel bison flex http://packages.efficios.com/rhel/7/x86_64/old/userspace-rcu/0.8/liburcu0-0.8.7-1.el7.x86_64.rpm http://packages.efficios.com/rhel/7/x86_64/old/userspace-rcu/0.8/liburcu-devel-0.8.7-1.el7.x86_64.rpm
+
+LTTNG_UST_DIR = bring
+LTTNG_UST_RPMS_TO_INSTALL = $(LTTNG_UST_DIR)/lttng-ust-2.6.2-1.s2.el7.centos.x86_64.rpm $(LTTNG_UST_DIR)/lttng-ust-devel-2.6.2-1.s2.el7.centos.x86_64.rpm
+
+SRC_PREFIX = lttng-tools-2.6.0
+SRC_TAR = $(SRC_PREFIX).tar.bz2
+
+BOOTSTRAP_DATA_PREFIX = bootstrap_data
+BOOTSTRAP_DATA_TAR = $(BOOTSTRAP_DATA_PREFIX).tar
+
+RPM_OUTPUT_DIR = $(ROOTFS)/output_rpms
+
+all: $(ROOTFS)
+
+submit:
+	solvent submitproduct rpms $(RPM_OUTPUT_DIR)
+
+approve:
+	solvent approve --product=rpms
+
+clean:
+	sudo rm -rf build/rootfs* $(BOOTSTRAP_DATA_TAR) $(SRC_TAR)
+
+$(ROOTFS):
+	echo "Building lttng-tools"
+	$(Q) sudo rm -fr $@
+	$(Q) mkdir -p $@
+
+	$(Q) sudo solvent bring --repositoryBasename=rootfs-clean-build --product=rootfs --destination=$@
+	$(Q) mkdir -p $@/output_rpms
+	$(Q) sudo ./chroot.sh $(ROOTFS) yum install $(RPMS_TO_INSTALL) --assumeyes
+	$(Q) mkdir -p $@/$(LTTNG_UST_DIR)
+	$(Q) sudo solvent bring --repositoryBasename=lttng-ust --product=rpms --destination=$@/bring
+	$(Q) sudo ./chroot.sh $(ROOTFS) yum localinstall $(LTTNG_UST_RPMS_TO_INSTALL) --assumeyes
+	$(Q) git archive --format=tar --prefix=$(BOOTSTRAP_DATA_PREFIX)/ HEAD | sudo sh -c "bzip2 -1c > ./$(BOOTSTRAP_DATA_TAR)"
+	$(Q) sudo cp $(BOOTSTRAP_DATA_TAR) $@
+	$(Q) sudo chroot $@ tar -xvf $(BOOTSTRAP_DATA_TAR)
+	$(Q) sudo chroot $@ sudo sh -c "cd $(BOOTSTRAP_DATA_PREFIX) && ./bootstrap"
+	$(Q) sudo tar --transform 's,^$@/$(BOOTSTRAP_DATA_PREFIX)/,$(SRC_PREFIX)/,S' -cvf $(SRC_TAR) --show-transformed $@/$(BOOTSTRAP_DATA_PREFIX)/
+	$(Q) sudo chroot $@ mkdir -p /root/rpmbuild/SOURCES
+	$(Q) sudo chroot $@ mkdir -p /root/rpmbuild/SPECS
+	$(Q) sudo cp $(SRC_TAR) $@/root/rpmbuild/SOURCES
+	$(Q) sudo cp lttng-relayd.service $@/root/rpmbuild/SOURCES
+	$(Q) sudo cp lttng-sessiond.service $@/root/rpmbuild/SOURCES
+	$(Q) sudo cp missing-files.patch $@/root/rpmbuild/SOURCES
+	$(Q) sudo cp lttng-tools.spec $@/root/rpmbuild/SPECS/lttng-tools.spec
+	$(Q) sudo ./chroot.sh $(ROOTFS) sudo sh -c "cd $(BOOTSTRAP_DATA_PREFIX) && ./lttng-tools-build.sh"

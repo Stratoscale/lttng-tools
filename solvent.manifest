@@ -1,0 +1,5 @@
+requirements:
+- hash: 7e3d96f7ce9150f3f99f7021154cd2220611ae25
+  originURL: https://github.com/Stratoscale/rootfs-clean-build.git
+- hash: 854b6aa9a97aa0892f39d51d96b90422e0e81c21
+  originURL: https://github.com/Stratoscale/lttng-ust.git

@@ -1,6 +1,8 @@
+%global strato_ver 2
+
 Name:           lttng-tools
 Version:        2.6.0
-Release:        1%{?dist}
+Release:        1.s%{strato_ver}%{?dist}
 Summary:        LTTng Trace Control
 Requires:       popt >= 1.13, libuuid, libxml2 >= 2.7.6, lttng-ust >= 2.6.0, lttng-ust < 2.7.0, liburcu >= 0.8.0
 
