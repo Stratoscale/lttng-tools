@@ -5,6 +5,8 @@ RPMS_TO_INSTALL = libtool popt-devel libuuid-devel bison flex http://packages.ef
 LTTNG_UST_DIR = bring
 LTTNG_UST_RPMS_TO_INSTALL = $(LTTNG_UST_DIR)/lttng-ust-2.6.2-1.s2.el7.centos.x86_64.rpm $(LTTNG_UST_DIR)/lttng-ust-devel-2.6.2-1.s2.el7.centos.x86_64.rpm
 
+PATCH_REINSTALLED_FILES = tests/regression/ust/java-jul/JTestLTTng.java tests/regression/ust/java-jul/test_java_jul tests/regression/ust/java-log4j/JTestLTTng.java tests/regression/ust/java-log4j/test_java_log4j
+
 SRC_PREFIX = lttng-tools-2.6.0
 SRC_TAR = $(SRC_PREFIX).tar.bz2
 
@@ -38,6 +40,7 @@ $(ROOTFS):
 	$(Q) git archive --format=tar --prefix=$(BOOTSTRAP_DATA_PREFIX)/ HEAD | sudo sh -c "bzip2 -1c > ./$(BOOTSTRAP_DATA_TAR)"
 	$(Q) sudo cp $(BOOTSTRAP_DATA_TAR) $@
 	$(Q) sudo chroot $@ tar -xvf $(BOOTSTRAP_DATA_TAR)
+	$(Q) sudo chroot $@ sudo sh -c "cd $(BOOTSTRAP_DATA_PREFIX) && rm -fr $(PATCH_REINSTALLED_FILES)"
 	$(Q) sudo chroot $@ sudo sh -c "cd $(BOOTSTRAP_DATA_PREFIX) && ./bootstrap"
 	$(Q) sudo tar --transform 's,^$@/$(BOOTSTRAP_DATA_PREFIX)/,$(SRC_PREFIX)/,S' -cvf $(SRC_TAR) --show-transformed $@/$(BOOTSTRAP_DATA_PREFIX)/
 	$(Q) sudo chroot $@ mkdir -p /root/rpmbuild/SOURCES
