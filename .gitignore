@@ -121,3 +121,7 @@ tests/regression/ust/python-logging/test_python_logging
 /include/version.h
 
 classnoinst.stamp
+
+build/
+lttng-tools-2.6.0.tar.bz2
+bootstrap_data.tar
