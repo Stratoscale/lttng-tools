@@ -1,8 +1,10 @@
+%global strato_ver 1
+
 Name:           lttng-tools
-Version:        2.8.0
-Release:        1%{?dist}
+Version:        2.8.1
+Release:        1.s%{strato_ver}%{?dist}
 Summary:        LTTng Trace Control
-Requires:       popt >= 1.13, libuuid1, libxml2 >= 2.7.6, lttng-ust >= 2.8.0, lttng-ust < 2.9.0, liburcu >= 0.8.4
+Requires:       popt >= 1.13, libuuid, libxml2 >= 2.7.6, lttng-ust >= 2.8.0, lttng-ust < 2.9.0, liburcu >= 0.8.4
 
 Group:          Development/Tools
 License:        LGPLv2.1 and GPLv2
@@ -24,30 +26,18 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 %description    devel
 The %{name}-devel package contains libraries and header files for developing applications that use liblttng-ctl.
 
-%package -n     python3-lttng
-Summary:        Python bindings for lttng-tools
-Group:          Development/Libraries
-Requires:       %{name}%{?_isa} = %{version}-%{release}, python3
-BuildRequires:  python3-devel, swig >= 2.0
-
-%description -n python3-lttng
-The python3-%{name} package contains the python bindings to lttng-tools.
-
 %prep
 %setup -q
 
 %build
 export PYTHON=python%{py3_ver}
 export PYTHON_CONFIG=python%{py3_ver}-config
-%configure --docdir=%{_docdir}/%{name} --enable-python-bindings
+%configure --docdir=%{_docdir}/%{name}
 V=1 make %{?_smp_mflags}
 
 %install
 make install DESTDIR=$RPM_BUILD_ROOT
 rm -vf $RPM_BUILD_ROOT%{_libdir}/*.la
-rm -vf $RPM_BUILD_ROOT%{python3_sitearch}/_lttng.a
-rm -vf $RPM_BUILD_ROOT%{python3_sitearch}/_lttng.la
-rm -vf $RPM_BUILD_ROOT%{python3_sitelib}/__pycache__/*
 install -D -m644 extras/lttng-bash_completion %{buildroot}%{_sysconfdir}/bash_completion.d/lttng
 install -D -m644 %{SOURCE1} %{buildroot}%{_unitdir}/lttng-sessiond.service
 install -D -m644 %{SOURCE2} %{buildroot}%{_unitdir}/lttng-relayd.service
@@ -124,11 +114,9 @@ exit 0
 %{_libdir}/liblttng-ctl.so
 %{_libdir}/pkgconfig/lttng-ctl.pc
 
-%files -n python3-lttng
-%{python3_sitelib}/lttng.py
-%{python3_sitearch}/_lttng.so*
-
 %changelog
+* Thu Jun 30 2016 Rafael Buchbinder <rafi@stratoscale.com> 2.8.1-1
+    - Update to strato 2.8.1 based on upstream/stable-2.8
 * Thu Jun 09 2016 Michael Jeanson <mjeanson@efficios.com> 2.8.0-1
     - Update to 2.8.0
 
