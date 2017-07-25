@@ -1,5 +1,10 @@
 #!/bin/sh
 
-rpmbuild -ba /root/rpmbuild/SPECS/lttng-tools.spec
+BUILD_DIR=$1
 
-cp /root/rpmbuild/RPMS/x86_64/*.rpm /output_rpms
+TOPDIR=`realpath $BUILD_DIR`
+echo "************* $BUILD_DIR"
+
+rpmbuild -ba ${BUILD_DIR}/rpmbuild/SPECS/lttng-tools.spec  --define "_topdir $TOPDIR/rpmbuild"
+
+cp ${BUILD_DIR}/rpmbuild/RPMS/x86_64/*.rpm ${BUILD_DIR}/output_rpms

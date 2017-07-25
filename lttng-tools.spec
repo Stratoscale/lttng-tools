@@ -38,9 +38,9 @@ V=1 make %{?_smp_mflags}
 %install
 make install DESTDIR=$RPM_BUILD_ROOT
 rm -vf $RPM_BUILD_ROOT%{_libdir}/*.la
-install -D -m644 extras/lttng-bash_completion %{buildroot}%{_sysconfdir}/bash_completion.d/lttng
-install -D -m644 %{SOURCE1} %{buildroot}%{_unitdir}/lttng-sessiond.service
-install -D -m644 %{SOURCE2} %{buildroot}%{_unitdir}/lttng-relayd.service
+install -D -m644 extras/lttng-bash_completion $RPM_BUILD_ROOT%{_sysconfdir}/bash_completion.d/lttng
+install -D -m644 %{SOURCE1} $RPM_BUILD_ROOT%{_unitdir}/lttng-sessiond.service
+install -D -m644 %{SOURCE2} $RPM_BUILD_ROOT%{_unitdir}/lttng-relayd.service
 
 %pre
 %service_add_pre lttng-sessiond.service lttng-relayd.service
