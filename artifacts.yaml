@@ -1,2 +1,7 @@
-rpms:
-  - build/output_rpms
+version: 2
+
+services:
+        lttng-sessiond.service:
+                rpms:
+                  - build/output_rpms
+
