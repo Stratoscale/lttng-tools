@@ -49,17 +49,17 @@ exit 0
 %post
 /sbin/ldconfig
 
-%systemd_post lttng-sessiond.service, lttng-relayd.service
+%systemd_post lttng-sessiond.service
 
 %preun
-%systemd_preun lttng-sessiond.service, lttng-relayd.service
+%systemd_preun lttng-sessiond.service
 
 %postun
 /sbin/ldconfig
 # Use %systemd_postun instead of %systemd_postun_with_restart
 # since we don't want to automatically restard these daemons on
 # upgrade (which would clear the currently active sessions).
-%systemd_postun lttng-sessiond.service, lttng-relayd.service
+%systemd_postun lttng-sessiond.service
 
 %files
 %{_mandir}/man1/lttng.1.gz
